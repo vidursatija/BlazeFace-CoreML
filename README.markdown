@@ -20,21 +20,27 @@ This means the included model will not be able to detect faces that are relative
 
 ## Inside this repo
 
-Essential files:
+Essential ML files:
 
-- **blazeface.py**: defines the `BlazeFace` class that does all the work
+- **ML/blazeface.py**: defines the `BlazeFace` class that does all the work
 
-- **blazeface.pth**: the weights for the trained model
+- **ML/blazeface.pth**: the weights for the trained model
 
-- **anchors.npy**: lookup table with anchor boxes
+- **ML/anchors.npy**: lookup table with anchor boxes
 
-Notebooks:
+ML Notebooks:
 
-- **Anchors.ipynb**: creates anchor boxes and saves them as a binary file (anchors.npy)
+- **ML/GenAnchors.ipynb**: creates anchor boxes and saves them as a binary file (anchors.npy)
 
-- **Convert.ipynb**: loads the weights from the TFLite model and converts them to PyTorch format (blazeface.pth)
+- **ML/Convert2PyTorch.ipynb**: loads the weights from the TFLite model and converts them to PyTorch format (blazeface.pth)
 
-- **Inference.ipynb**: shows how to use the `BlazeFace` class to make face detections
+- **ML/InferencePyTorch.ipynb**: shows how to use the `BlazeFace` class to make face detections
+
+- **ML/Convert2CoreML.ipynb**: loads the weights from the TFLite model and converts them to PyTorch format (blazeface.pth)
+
+iOS CoreML App:
+
+- TODO -
 
 ## Detections
 
@@ -59,10 +65,10 @@ Each face detection is a PyTorch `Tensor` consisting of 17 numbers:
 
 Included for testing are the following images:
 
-- **1face.png**. Fei Fei Li by [ITU Pictures](https://www.flickr.com/photos/itupictures/35011409612/), CC BY 2.0
+- **ML/1face.png**. Fei Fei Li by [ITU Pictures](https://www.flickr.com/photos/itupictures/35011409612/), CC BY 2.0
 
-- **3faces.png**. Geoffrey Hinton, Yoshua Bengio, Yann Lecun. Found at [AIBuilders](https://aibuilders.ai/le-prix-turing-recompense-trois-pionniers-de-lintelligence-artificielle-yann-lecun-yoshua-bengio-et-geoffrey-hinton/)
+- **ML/3faces.png**. Geoffrey Hinton, Yoshua Bengio, Yann Lecun. Found at [AIBuilders](https://aibuilders.ai/le-prix-turing-recompense-trois-pionniers-de-lintelligence-artificielle-yann-lecun-yoshua-bengio-et-geoffrey-hinton/)
 
-- **4faces.png** from Andrew Ng’s Facebook page / [KDnuggets](https://www.kdnuggets.com/2015/03/talking-machine-deep-learning-gurus-p1.html)
+- **ML/4faces.png** from Andrew Ng’s Facebook page / [KDnuggets](https://www.kdnuggets.com/2015/03/talking-machine-deep-learning-gurus-p1.html)
 
 These images were scaled down to 128x128 pixels as that is the expected input size of the model.
