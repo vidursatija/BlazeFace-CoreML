@@ -268,6 +268,34 @@ class BlazeFace(nn.Module):
 
         return output_detections
 
+    def _decode_boxes_coreml(self, raw_boxes, anchors):
+        """Converts the predictions into actual coordinates using
+        the anchor boxes. Processes the entire batch at once.
+        """
+        # print(raw_boxes.size())
+        # boxes = torch.zeros(size=(896, 16)) # raw_boxes.clone() # torch.zeros_like(raw_boxes)
+
+        x_center = (raw_boxes[:, 0] / 128.0) * anchors[:, 2] + anchors[:, 0]
+        y_center = (raw_boxes[:, 1] / 128.0) * anchors[:, 3] + anchors[:, 1]
+
+        w = (raw_boxes[:, 2] / 128.0) * anchors[:, 2]
+        h = (raw_boxes[:, 3] / 128.0) * anchors[:, 3]
+
+        raw_boxes[:, 0] = y_center - h / 2.  # ymin
+        raw_boxes[:, 1] = x_center - w / 2.  # xmin
+        raw_boxes[:, 2] = y_center + h / 2.  # ymax
+        raw_boxes[:, 3] = x_center + w / 2.  # xmax
+
+        
+        for k in range(6):
+            offset = 4 + k*2
+            keypoint_x = (raw_boxes[:, offset    ] / 128.0) * anchors[:, 2] + anchors[:, 0]
+            keypoint_y = (raw_boxes[:, offset + 1] / 128.0) * anchors[:, 3] + anchors[:, 1]
+            raw_boxes[:, offset    ] = keypoint_x
+            raw_boxes[:, offset + 1] = keypoint_y
+
+        return raw_boxes
+
     def _decode_boxes(self, raw_boxes, anchors):
         """Converts the predictions into actual coordinates using
         the anchor boxes. Processes the entire batch at once.

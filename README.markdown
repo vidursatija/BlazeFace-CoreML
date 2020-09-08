@@ -30,13 +30,13 @@ Essential ML files:
 
 ML Notebooks:
 
-- **ML/GenAnchors.ipynb**: creates anchor boxes and saves them as a binary file (anchors.npy)
+- **ML/GenAnchors.ipynb**: creates anchor boxes and saves them as a binary file (ML/anchors.npy)
 
-- **ML/Convert2PyTorch.ipynb**: loads the weights from the TFLite model and converts them to PyTorch format (blazeface.pth)
+- **ML/Convert2PyTorch.ipynb**: loads the weights from the TFLite model and converts them to PyTorch format (ML/blazeface.pth)
 
 - **ML/InferencePyTorch.ipynb**: shows how to use the `BlazeFace` class to make face detections
 
-- **ML/Convert2CoreML.ipynb**: loads the weights from the TFLite model and converts them to PyTorch format (blazeface.pth)
+- **ML/Convert2CoreML.ipynb**: loads the weights from the PyTorch model and converts them to CoreML format (--)
 
 iOS CoreML App:
 
