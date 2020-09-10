@@ -33,7 +33,7 @@ class BlazeFaceInput: MLFeatureProvider {
         }
 
         let options: [MLFeatureValue.ImageOption: Any] = [
-            .cropAndScale: VNImageCropAndScaleOption.scaleFill.rawValue
+            .cropAndScale: VNImageCropAndScaleOption.scaleFit.rawValue
         ]
 
         return try? MLFeatureValue(cgImage: imageFeature,
@@ -78,7 +78,7 @@ class BlazeFaceModel {
         
         let hScale = max(imgH, imgW) / imgH
         let wScale = max(imgH, imgW) / imgW
-        let wB = wScale - 1
+        // let wB = wScale - 1
         
         let x = BlazeFaceInput(image: imageFeature!)
         guard let points = try? self.model!.prediction(from: x) else {
@@ -108,7 +108,7 @@ class BlazeFaceModel {
                 // find IoU with everything
                 // remove overlapping ones and average them out
                 let iiou = IOU(rArray[cIndices[0]], rArray[cIndices[i]])
-                if iiou > 0.3 {
+                if iiou >= 0.3 {
                     overlapRs.append(cArray[cIndices[i]]*rArray[cIndices[i]])
                     overlapCscore += cArray[cIndices[i]]
                 } else {
@@ -120,9 +120,9 @@ class BlazeFaceModel {
             var betterR = SIMD16<Double>(repeating: 0)
             for i in 0..<16 {
                 if i % 2 == 0 {
-                    betterR[i/2] = Double(averageR[i]*wScale) // all Xs
+                    betterR[i/2] = Double(averageR[i]*wScale - (wScale-1)/2.0) // all Xs
                 } else {
-                    betterR[8+i/2] = Double(averageR[i]*hScale) // all Ys
+                    betterR[8+i/2] = Double(averageR[i]*hScale - (hScale-1)/2.0) // all Ys
                 }
             }
             retRArray.append(betterR)

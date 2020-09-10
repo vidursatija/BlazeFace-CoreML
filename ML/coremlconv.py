@@ -42,6 +42,11 @@ class BlazeFaceScaled(Module):
 		concat_stuff.append(x_center + w / 2.0)
 		concat_stuff.append(y_center + h / 2.0)
 
+		# concat_stuff.append(w)
+		# concat_stuff.append(h)
+		# concat_stuff.append(x_center)
+		# concat_stuff.append(y_center)
+
 		# raw_boxes[:, 0] = y_center - h / 2.  # ymin
 		# raw_boxes[:, 1] = x_center - w / 2.  # xmin
 		# raw_boxes[:, 2] = y_center + h / 2.  # ymax

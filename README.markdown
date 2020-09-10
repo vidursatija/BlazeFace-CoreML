@@ -4,11 +4,11 @@ BlazeFace is a fast, light-weight face detector from Google Research. [Read more
 
 A pretrained model is available as part of Google's [MediaPipe](https://github.com/google/mediapipe/blob/master/mediapipe/docs/face_detection_mobile_gpu.md) framework.
 
-![](https://raw.githubusercontent.com/google/mediapipe/master/mediapipe/docs/images/realtime_face_detection.gif)
+<!--![](https://raw.githubusercontent.com/google/mediapipe/master/mediapipe/docs/images/realtime_face_detection.gif) -->
 
 Besides a bounding box, BlazeFace also predicts 6 keypoints for face landmarks (2x eyes, 2x ears, nose, mouth).
 
-Because BlazeFace is designed for use on mobile devices, the pretrained model is in TFLite format. However, I wanted to use it from PyTorch and so I converted it.
+Because BlazeFace is designed for use on mobile devices, the pretrained model is in TFLite format. However, I wanted to use it in CoreML and not TensorFlow. 
 
 > **NOTE:** The MediaPipe model is slightly different from the model described in the BlazeFace paper. It uses depthwise convolutions with a 3x3 kernel, not 5x5. And it only uses "single" BlazeBlocks, not "double" ones.
 
@@ -36,18 +36,39 @@ ML Notebooks:
 
 - **ML/InferencePyTorch.ipynb**: shows how to use the `BlazeFace` class to make face detections
 
-- **ML/Convert2CoreML.ipynb**: loads the weights from the PyTorch model and converts them to CoreML format (--)
+- **ML/coremlconv.py**: loads the weights from the PyTorch model and converts them to CoreML format
 
-iOS CoreML App:
+iOS CoreML App
 
-- TODO -
+- **App/**
 
 ## Detections
+
+### PyTorch
 
 Each face detection is a PyTorch `Tensor` consisting of 17 numbers:
 
 - The first 4 numbers describe the bounding box corners: 
     - `ymin, xmin, ymax, xmax`
+    - These are normalized coordinates (between 0 and 1).
+
+- The next 12 numbers are the x,y-coordinates of the 6 facial landmark keypoints:
+    - `right_eye_x, right_eye_y`
+    - `left_eye_x, left_eye_y`
+    - `nose_x, nose_y`
+    - `mouth_x, mouth_y`
+    - `right_ear_x, right_ear_y`
+    - `left_ear_x, left_ear_y`
+    - Tip: these labeled as seen from the perspective of the person, so their right is your left.
+
+- The final number is the confidence score that this detection really is a face.
+
+### CoreML
+
+Each face detection has 2 `MLMultiArray` consisting of landmarks(16 numbers) and confidence(1 number):
+
+- The first 4 numbers in landmarks describe the bounding box corners: 
+    - `xmin, ymin, xmax, ymax`
     - These are normalized coordinates (between 0 and 1).
 
 - The next 12 numbers are the x,y-coordinates of the 6 facial landmark keypoints:

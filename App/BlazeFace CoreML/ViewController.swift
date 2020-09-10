@@ -24,17 +24,9 @@ class FaceDetectionViewController: UIViewController {
     
     let bfm = BlazeFaceModel()
 
-    var maxX: CGFloat = 0.0
-    var midY: CGFloat = 0.0
-    var maxY: CGFloat = 0.0
-
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCaptureSession()
-
-        maxX = view.bounds.maxX
-        midY = view.bounds.midY
-        maxY = view.bounds.maxY
 
         session.startRunning()
     }
@@ -88,18 +80,26 @@ extension FaceDetectionViewController: AVCaptureVideoDataOutputSampleBufferDeleg
         }
         let faces = bfm.predict(for: imageBuffer)
         if faces.confidence.count > 0 {
-          
             DispatchQueue.main.async {
-                var fL = faces.landmarks[0]
-                let fC = faces.confidence[0]
-                fL.lowHalf *= Double(self.faceView.frame.width)
-                fL.highHalf *= Double(self.faceView.frame.height)
-                self.faceView.boundingBox = CGRect(x: fL[0], y: fL[8], width: fL[1]-fL[0], height: fL[9]-fL[8])
+                self.faceView.clear()
+                for f in faces.landmarks {
+                    var fL = f
+                    fL.lowHalf *= Double(self.faceView.frame.width)
+                    fL.highHalf *= Double(self.faceView.frame.height)
+                    self.faceView.boundingBox.append(CGRect(x: fL[0], y: fL[8], width: fL[1]-fL[0], height: fL[9]-fL[8]))
+                    self.faceView.rightEye.append(CGPoint(x: fL[2], y: fL[10]))
+                    self.faceView.leftEye.append(CGPoint(x: fL[3], y: fL[11]))
+                    self.faceView.nose.append(CGPoint(x: fL[4], y: fL[12]))
+                    self.faceView.mouth.append(CGPoint(x: fL[5], y: fL[13]))
+                    self.faceView.rightEar.append(CGPoint(x: fL[6], y: fL[14]))
+                    self.faceView.leftEar.append(CGPoint(x: fL[7], y: fL[15]))
+                }
                 self.faceView.setNeedsDisplay()
             }
         } else {
             DispatchQueue.main.async {
                 self.faceView.clear()
+                self.faceView.setNeedsDisplay()
             }
         }
         // print(faces.confidence.count)

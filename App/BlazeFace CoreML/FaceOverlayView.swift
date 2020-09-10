@@ -12,22 +12,24 @@ import UIKit
 import Vision
 
 class FaceOverlayView: UIView {
-    var leftEye: CGPoint = .zero
-    var rightEye: CGPoint = .zero
-    var nose: CGPoint = .zero
+    var leftEye: [CGPoint] = []
+    var rightEye: [CGPoint] = []
+    var nose: [CGPoint] = []
+    var mouth: [CGPoint] = []
+    var leftEar: [CGPoint] = []
+    var rightEar: [CGPoint] = []
 
-    var boundingBox = CGRect.zero
+    var boundingBox: [CGRect] = []
 
     func clear() {
-        leftEye = .zero
-        rightEye = .zero
-        nose = .zero
+        leftEye = []
+        rightEye = []
+        nose = []
+        mouth = []
+        leftEar = []
+        rightEar = []
 
-        boundingBox = .zero
-
-        DispatchQueue.main.async {
-            self.setNeedsDisplay()
-        }
+        boundingBox = []
     }
     override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else {
@@ -38,21 +40,23 @@ class FaceOverlayView: UIView {
           context.restoreGState()
         }
 
-        context.addRect(boundingBox)
-        UIColor.red.setStroke()
-        context.strokePath()
-
-        UIColor.white.setStroke()
-        if leftEye != .zero {
-            context.addEllipse(in: CGRect(x: leftEye.x, y: leftEye.y, width: 2.0, height: 2.0))
-            context.closePath()
-            context.strokePath()
+        if boundingBox.count > 0 {
+            for bb in boundingBox {
+                context.addRect(bb)
+                UIColor.red.setStroke()
+                context.strokePath()
+            }
         }
         
-        if rightEye != .zero {
-            context.addEllipse(in: CGRect(x: rightEye.x, y: rightEye.y, width: 2.0, height: 2.0))
-            context.closePath()
-            context.strokePath()
+        UIColor.white.setStroke()
+        for bodyPart in [leftEye, rightEye, nose, mouth, leftEar, rightEar] {
+            if bodyPart.count > 0 {
+                for bP in bodyPart {
+                    context.addEllipse(in: CGRect(x: bP.x, y: bP.y, width: 10.0, height: 10.0))
+                    context.closePath()
+                    context.strokePath()
+                }
+            }
         }
     }
 }
