@@ -116,24 +116,14 @@ class BlazeFaceModel {
                 }
             }
             cIndices = nonOverlapI
-            var averageR = overlapRs.reduce(SIMD16<Float32>(repeating: 0), +) / overlapCscore
-            averageR[0] *= hScale
-            averageR[1] = averageR[1]*wScale
-            averageR[2] *= hScale
-            averageR[3] = averageR[3]*wScale
-            for i in 4..<16 {
-                if i % 2 == 0 {
-                    averageR[i] *= wScale
-                } else {
-                    averageR[i] *= hScale
-                }
-            }
+            let averageR = overlapRs.reduce(SIMD16<Float32>(repeating: 0), +) / overlapCscore
             var betterR = SIMD16<Double>(repeating: 0)
-            for x in [0, 2, 5, 7, 9, 11, 13, 15].enumerated() {
-                betterR[8+x.offset] = Double(averageR[x.element]) // all Ys
-            }
-            for x in [1, 3, 4, 6, 8, 10, 12, 14].enumerated() {
-                betterR[x.offset] = Double(averageR[x.element]) // all Xs
+            for i in 0..<16 {
+                if i % 2 == 0 {
+                    betterR[i/2] = Double(averageR[i]*wScale) // all Xs
+                } else {
+                    betterR[8+i/2] = Double(averageR[i]*hScale) // all Ys
+                }
             }
             retRArray.append(betterR)
             retCArray.append(overlapCscore / Float32(overlapRs.count))
