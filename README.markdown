@@ -4,7 +4,7 @@ BlazeFace is a fast, light-weight face detector from Google Research. [Read more
 
 A pretrained model is available as part of Google's [MediaPipe](https://github.com/google/mediapipe/blob/master/mediapipe/docs/face_detection_mobile_gpu.md) framework.
 
-<!--![](https://raw.githubusercontent.com/google/mediapipe/master/mediapipe/docs/images/realtime_face_detection.gif) -->
+![](https://google.github.io/mediapipe/images/mobile/face_detection_android_gpu.gif)
 
 Besides a bounding box, BlazeFace also predicts 6 keypoints for face landmarks (2x eyes, 2x ears, nose, mouth).
 
