@@ -60,6 +60,25 @@ public func IOU(_ a: SIMD16<Float32>, _ b: SIMD16<Float32>) -> Float {
     return Float(intersectionArea / (areaA + areaB - intersectionArea))
 }
 
+class Face {
+    static let minBox = 0
+    static let maxBox = 1
+    static let rightEye = 2
+    static let leftEye = 3
+    static let nose = 4
+    static let mouth = 5
+    static let rightEar = 6
+    static let leftEar = 7
+    
+    var landmark: Array<SIMD2<Double>>
+    var confidence: Float
+    
+    init(landmark: Array<SIMD2<Double>>, confidence: Float) {
+        self.landmark = landmark
+        self.confidence = confidence
+    }
+}
+
 class BlazeFaceModel {
     var model: MLModel?
     let minConfidence: Float32 = 0.75
@@ -69,7 +88,7 @@ class BlazeFaceModel {
         self.model = BlazeFaceScaled().model
     }
     
-    func predict(for buffer: CVPixelBuffer) -> (landmarks: [SIMD16<Double>], confidence: [Float32]) {
+    func predict(for buffer: CVPixelBuffer) -> Array<Face> {
 
         var imageFeature: CGImage?
         VTCreateCGImageFromCVPixelBuffer(buffer, options: nil, imageOut: &imageFeature)
@@ -78,11 +97,12 @@ class BlazeFaceModel {
         
         let hScale = max(imgH, imgW) / imgH
         let wScale = max(imgH, imgW) / imgW
-        // let wB = wScale - 1
+        let scaleSIMD = SIMD2(Double(wScale), Double(hScale))
+        let shiftSIMD = SIMD2(Double(wScale-1)/2.0, Double(hScale-1)/2.0)
         
         let x = BlazeFaceInput(image: imageFeature!)
         guard let points = try? self.model!.prediction(from: x) else {
-            return ([], [])
+            return []
         }
         let rPointsMLArray = points.featureValue(for: "1477")?.multiArrayValue
         let rPoints = rPointsMLArray?.dataPointer.bindMemory(to: SIMD16<Float32>.self, capacity: rPointsMLArray!.count/16) // 896 x 8 x 2 -> 2 bounding box + 6 keypoints
@@ -97,8 +117,7 @@ class BlazeFaceModel {
         var cIndices = cArray.enumerated().filter({ $0.element >= self.minConfidence }).map({ $0.offset })
         cIndices.sort(by: { cArray[$0] > cArray[$1] })
         
-        var retRArray = Array<SIMD16<Double>>()
-        var retCArray = Array<Float32>()
+        var retRArray = Array<Face>()
         
         while cIndices.count > 0 {
             var overlapRs = Array<SIMD16<Float32>>()
@@ -117,17 +136,13 @@ class BlazeFaceModel {
             }
             cIndices = nonOverlapI
             let averageR = overlapRs.reduce(SIMD16<Float32>(repeating: 0), +) / overlapCscore
-            var betterR = SIMD16<Double>(repeating: 0)
-            for i in 0..<16 {
-                if i % 2 == 0 {
-                    betterR[i/2] = Double(averageR[i]*wScale - (wScale-1)/2.0) // all Xs
-                } else {
-                    betterR[8+i/2] = Double(averageR[i]*hScale - (hScale-1)/2.0) // all Ys
-                }
+            var faceR = Array<SIMD2<Double>>()
+            for i in 0..<8 {
+                let faceL = SIMD2(Double(averageR[2*i]), Double(averageR[2*i+1])) * scaleSIMD - shiftSIMD
+                faceR.append(faceL)
             }
-            retRArray.append(betterR)
-            retCArray.append(overlapCscore / Float32(overlapRs.count))
+            retRArray.append(Face(landmark: faceR, confidence: overlapCscore / Float(overlapRs.count)))
         }
-        return (retRArray, retCArray)
+        return retRArray
     }
 }

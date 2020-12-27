@@ -46,31 +46,23 @@ iOS CoreML App
 
 ### CoreML
 
-Each face detection has 1 SIMD16 vector and 1 Float number consisting of landmarks(16 numbers) and confidence(1 number):
+Each face detection has 8 SIMD2 vectors(landmarks) and 1 Float number(confidence):
 
-- The first 8 numbers in landmarks describe:
-	- `bounding_box_xmin`
-	- `bounding_box_xmax`
-	- `right_eye_x`
-	- `left_eye_x`
-	- `nose_x`
-	- `mouth_x`
-	- `right_ear_x`
-	- `left_ear_x`
+- The first 4 numbers describe the bounding box corners: 
+    - `xmin, ymin, xmax, ymax`
 
-- The last 8 numbers in landmarks describe:
-	- `bounding_box_ymin`
-	- `bounding_box_ymax`
-	- `right_eye_y`
-	- `left_eye_y`
-	- `nose_y`
-	- `mouth_y`
-	- `right_ear_y`
-	- `left_ear_y`
+- The next 12 numbers are the x,y-coordinates of the 6 facial landmark keypoints:
+    - `right_eye_x, right_eye_y`
+    - `left_eye_x, left_eye_y`
+    - `nose_x, nose_y`
+    - `mouth_x, mouth_y`
+    - `right_ear_x, right_ear_y`
+    - `left_ear_x, left_ear_y`
+    - Tip: these labeled as seen from the perspective of the person, so their right is your left.
 
 - These are normalized coordinates (between 0 and 1).
 
-- SIMD16 is used for faster vector scaling.
+- SIMD2 is used for faster vector math.
 
 - The final number is the confidence score that this detection really is a face.
 

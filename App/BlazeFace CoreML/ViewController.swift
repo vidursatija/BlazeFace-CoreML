@@ -79,39 +79,22 @@ extension FaceDetectionViewController: AVCaptureVideoDataOutputSampleBufferDeleg
             return
         }
         let faces = bfm.predict(for: imageBuffer)
-        if faces.confidence.count > 0 {
-            DispatchQueue.main.async {
-                self.faceView.clear()
-                for f in faces.landmarks {
-                    var fL = f
-                    fL.lowHalf *= Double(self.faceView.frame.width)
-                    fL.highHalf *= Double(self.faceView.frame.height)
-                    self.faceView.boundingBox.append(CGRect(x: fL[0], y: fL[8], width: fL[1]-fL[0], height: fL[9]-fL[8]))
-                    self.faceView.rightEye.append(CGPoint(x: fL[2], y: fL[10]))
-                    self.faceView.leftEye.append(CGPoint(x: fL[3], y: fL[11]))
-                    self.faceView.nose.append(CGPoint(x: fL[4], y: fL[12]))
-                    self.faceView.mouth.append(CGPoint(x: fL[5], y: fL[13]))
-                    self.faceView.rightEar.append(CGPoint(x: fL[6], y: fL[14]))
-                    self.faceView.leftEar.append(CGPoint(x: fL[7], y: fL[15]))
-                }
-                self.faceView.setNeedsDisplay()
+        DispatchQueue.main.async {
+            self.faceView.clear()
+            for f in faces {
+//                fL.lowHalf *= Double(self.faceView.frame.width)
+//                fL.highHalf *= Double(self.faceView.frame.height)
+                self.faceView.boundingBox.append(CGRect(x: f.landmark[Face.minBox].x*Double(self.faceView.frame.width), y: f.landmark[Face.minBox].y*Double(self.faceView.frame.height), width: (f.landmark[Face.maxBox].x - f.landmark[Face.minBox].x)*Double(self.faceView.frame.width), height: (f.landmark[Face.maxBox].y - f.landmark[Face.minBox].y)*Double(self.faceView.frame.height)))
+
+                self.faceView.rightEye.append(f.landmark[Face.rightEye])
+                self.faceView.leftEye.append(f.landmark[Face.leftEye])
+                self.faceView.nose.append(f.landmark[Face.nose])
+                self.faceView.mouth.append(f.landmark[Face.mouth])
+                self.faceView.rightEar.append(f.landmark[Face.rightEar])
+                self.faceView.leftEar.append(f.landmark[Face.leftEar])
             }
-        } else {
-            DispatchQueue.main.async {
-                self.faceView.clear()
-                self.faceView.setNeedsDisplay()
-            }
+            self.faceView.setNeedsDisplay()
         }
-        // print(faces.confidence.count)
+        // print(faces.count)
     }
 }
-
-//extension FaceDetectionViewController {
-//    func updateFaceView(for result: VNFaceObservation) {
-//        defer {
-//            DispatchQueue.main.async {
-//                self.faceView.setNeedsDisplay()
-//            }
-//        }
-//    }
-//}

@@ -12,12 +12,12 @@ import UIKit
 import Vision
 
 class FaceOverlayView: UIView {
-    var leftEye: [CGPoint] = []
-    var rightEye: [CGPoint] = []
-    var nose: [CGPoint] = []
-    var mouth: [CGPoint] = []
-    var leftEar: [CGPoint] = []
-    var rightEar: [CGPoint] = []
+    var leftEye: [SIMD2<Double>] = []
+    var rightEye: [SIMD2<Double>] = []
+    var nose: [SIMD2<Double>] = []
+    var mouth: [SIMD2<Double>] = []
+    var leftEar: [SIMD2<Double>] = []
+    var rightEar: [SIMD2<Double>] = []
 
     var boundingBox: [CGRect] = []
 
@@ -52,7 +52,7 @@ class FaceOverlayView: UIView {
         for bodyPart in [leftEye, rightEye, nose, mouth, leftEar, rightEar] {
             if bodyPart.count > 0 {
                 for bP in bodyPart {
-                    context.addEllipse(in: CGRect(x: bP.x, y: bP.y, width: 10.0, height: 10.0))
+                    context.addEllipse(in: CGRect(x: CGFloat(bP.x)*self.frame.width, y: CGFloat(bP.y)*self.frame.height, width: 10.0, height: 10.0))
                     context.closePath()
                     context.strokePath()
                 }
